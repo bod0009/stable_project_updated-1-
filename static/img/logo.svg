@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCE588" />
+      <stop offset="30%" stop-color="#D4AF37" />
+      <stop offset="70%" stop-color="#AA771C" />
+      <stop offset="100%" stop-color="#FDF3A9" />
+    </linearGradient>
+    <linearGradient id="goldShine" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8B6508" />
+      <stop offset="50%" stop-color="#E5C158" />
+      <stop offset="100%" stop-color="#FFF2A3" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Elegant Golden Horse Head Silhouette and Crest -->
+  <g filter="url(#shadow)">
+    <!-- Ears and Forelock -->
+    <path d="M290,110 C295,85 305,65 315,60 C317,75 310,95 302,115 C310,105 325,90 340,95 C335,115 320,135 305,145 Z" fill="url(#goldGradient)" />
+    
+    <!-- Mane Tufts -->
+    <path d="M260,130 C235,145 200,185 185,225 C195,215 215,205 235,200 C205,225 170,285 155,340 C175,305 210,270 245,255 C215,290 190,345 185,385 C205,345 240,310 275,290 C260,325 245,365 245,395 C270,355 305,320 335,305 C315,335 300,375 305,405 C330,360 365,330 400,315 C370,300 340,270 330,230 C350,225 365,220 375,215 C360,205 340,195 325,185 C350,180 370,170 380,160 C355,150 325,145 295,140 Z" fill="url(#goldGradient)" />
+
+    <!-- Horse Face & Muzzle Profile -->
+    <path d="M305,145 C325,160 345,185 360,215 C375,245 405,295 425,320 C435,332 445,340 435,355 C425,370 405,375 385,365 C370,358 360,345 350,335 C330,345 310,350 285,350 C260,350 240,340 220,325 C245,305 270,280 290,250 C310,220 315,180 305,145 Z" fill="url(#goldShine)" />
+
+    <!-- Eye & Nostril details -->
+    <path d="M360,225 C365,215 375,215 380,225 C375,230 365,230 360,225 Z" fill="#6B4E1B" />
+    <path d="M410,335 C413,328 420,328 422,335 C420,342 413,342 410,335 Z" fill="#6B4E1B" />
+
+    <!-- Flowing Gold Ribbon / Arc Underneath -->
+    <path d="M100,455 C190,440 310,440 400,455 C320,465 180,465 100,455 Z" fill="url(#goldGradient)" />
+  </g>
+
+  <!-- Typography: AL-Khyala -->
+  <text x="50%" y="435" text-anchor="middle" font-family="'Tajawal', 'Georgia', 'Cinzel', serif" font-weight="900" font-size="44" fill="url(#goldGradient)" letter-spacing="3">AL-Khyala</text>
+</svg>

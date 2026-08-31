@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>الخيّالة — نظام إدارة الإسطبلات الرقمي | AL-Khyala</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ========================================== -->
+<!-- 1. PROFESSIONAL LUXURY LOGIN SCREEN       -->
+<!-- ========================================== -->
+<div id="loginScreen" class="login-overlay">
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="login-logo-wrap">
+          <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="AL-Khyala Logo" class="login-logo">
+        </div>
+        <h1 class="login-title">الخيّالة <span class="en-sub">AL-Khyala</span></h1>
+        <p class="login-subtitle" data-i18n="stableManagement">نظام الإدارة الرقمية والفروسية المتكامل</p>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="input-group">
+          <label for="loginUsername">
+            <span class="icon">👤</span> <span data-i18n="usernameLabel">اسم المستخدم</span>
+          </label>
+          <input type="text" id="loginUsername" name="username" required placeholder="أدخل اسم المستخدم" autocomplete="username">
+        </div>
+
+        <div class="input-group">
+          <label for="loginPassword">
+            <span class="icon">🔒</span> <span data-i18n="passwordLabel">كلمة المرور</span>
+          </label>
+          <div class="password-wrap">
+            <input type="password" id="loginPassword" name="password" required placeholder="••••••••" autocomplete="current-password">
+            <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('loginPassword')" title="إظهار/إخفاء">👁️</button>
+          </div>
+        </div>
+
+        <p id="loginError" class="login-error-msg" style="display:none;"></p>
+
+        <button type="submit" id="loginSubmitBtn" class="btn-login-submit">
+          <span data-i18n="loginBtnText">تسجيل الدخول للنظام</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 2. PRINTABLE OFFICIAL LETTERHEAD           -->
+<!-- ========================================== -->
+<div class="print-header">
+  <div class="print-brand">
+    <img src="{{ url_for('static', filename='img/logo.svg') }}" class="print-logo" alt="AL-Khyala">
+    <div>
+      <h2 id="printStableName">إسطبل الخيّالة — AL-Khyala</h2>
+      <p id="printStableLocation">نظام إدارة الإسطبلات والفروسية | الإسكندرية، مصر</p>
+    </div>
+  </div>
+  <div class="print-meta">
+    <div><b>تاريخ التقرير:</b> <span id="printDate">—</span></div>
+    <div><b>العملة:</b> <span id="printCurrency">الجنيه المصري (ج.م)</span></div>
+  </div>
+</div>
+
+<!-- Dedicated Full Horse Print Dossier Container -->
+<div id="horsePrintDossier" class="horse-print-dossier"></div>
+
+<!-- ========================================== -->
+<!-- 3. SIDEBAR NAVIGATION                      -->
+<!-- ========================================== -->
+<aside class="no-print">
+  <div class="brand">
+    <div class="brand-logo-wrap">
+      <img src="{{ url_for('static', filename='img/logo.svg') }}" class="main-brand-logo" alt="AL-Khyala">
+    </div>
+    <div class="brand-title">الخيّالة<small data-i18n="stableManagement">نظام الإدارة الرقمية للإسطبل</small></div>
+  </div>
+
+  <!-- User Profile Info in Sidebar with Clear Full Logout Button -->
+  <div id="userWidget" class="user-sidebar-widget">
+    <div class="user-card-top">
+      <div class="user-avatar" id="userAvatar">👑</div>
+      <div class="user-meta">
+        <b id="userFullName">المدير العام</b>
+        <span class="user-role-badge" id="userRoleBadge">مدير الإسطبل</span>
+      </div>
+    </div>
+    <button type="button" class="btn-logout-full" onclick="handleLogout()">
+      <span class="logout-icon">🚪</span>
+      <span data-i18n="logout">تسجيل الخروج</span>
+    </button>
+  </div>
+
+  <nav>
+    <a class="active" href="#dashboard" data-i18n="dashboard">
+      <span class="nav-icon">📊</span> <span class="nav-text">لوحة المتابعة</span>
+    </a>
+    <a href="#horses" data-i18n="horses">
+      <span class="nav-icon">🐎</span> <span class="nav-text">الخيول</span>
+    </a>
+    <a href="#tasks" data-i18n="dailyCare">
+      <span class="nav-icon">📋</span> <span class="nav-text">الرعاية والمهام</span>
+    </a>
+    <a href="#finance" class="role-restricted-nav" data-i18n="finance">
+      <span class="nav-icon">💰</span> <span class="nav-text">الحسابات والمالية</span>
+    </a>
+    <a href="#archive" data-i18n="archive">
+      <span class="nav-icon">📁</span> <span class="nav-text">الأرشيف</span>
+    </a>
+    <a href="#settings" class="role-restricted-nav" data-i18n="settings">
+      <span class="nav-icon">⚙️</span> <span class="nav-text">الإعدادات والنسخ</span>
+    </a>
+  </nav>
+
+  <div class="side-footer">
+    <b id="sidebarStableName" data-i18n="mainStable">إسطبل الخيّالة</b>
+    <span class="online" data-i18n="systemOn">● النظام يعمل بكفاءة</span>
+  </div>
+</aside>
+
+<!-- ========================================== -->
+<!-- 4. MAIN CONTENT AREA                       -->
+<!-- ========================================== -->
+<main>
+  <header class="no-print">
+    <div>
+      <p class="eyebrow" data-i18n="welcome">مرحباً بك في لوحة الإدارة</p>
+      <h1 data-i18n="greeting" id="headerGreeting">صباح الخير، مدير الإسطبل</h1>
+      <p id="today" class="today-date">—</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn-lang" onclick="toggleLanguage()">English</button>
+      <button type="button" class="btn-sec" onclick="openTask()" data-i18n="addTask">+ مهمة رعاية</button>
+      <button type="button" class="btn-sec role-restricted-action" onclick="openPayment()" data-i18n="addPayment">+ فاتورة/دفعة</button>
+      <button type="button" class="btn-primary" onclick="openHorse()" data-i18n="addHorse">+ إضافة حصان</button>
+    </div>
+  </header>
+
+  <!-- SECTION: DASHBOARD -->
+  <section id="dashboard" class="page-section">
+    <div class="summary operations">
+      <article class="stat-card">
+        <div class="stat-header">
+          <span data-i18n="activeHorses">الخيول النشطة</span>
+          <span class="stat-icon">🐎</span>
+        </div>
+        <strong id="horsesCount">—</strong>
+        <i data-i18n="liveRecord">سجل حي ومحدّث</i>
+      </article>
+      <article class="stat-card">
+        <div class="stat-header">
+          <span data-i18n="medicalDue">استحقاق بيطري</span>
+          <span class="stat-icon">💉</span>
+        </div>
+        <strong id="medicalCount">—</strong>
+        <i data-i18n="upcomingMedical">استحقاقات قريبة</i>
+      </article>
+      <article class="stat-card">
+        <div class="stat-header">
+          <span data-i18n="feedingPlans">خطط التغذية</span>
+          <span class="stat-icon">🌾</span>
+        </div>
+        <strong id="feedingCount">—</strong>
+        <i data-i18n="activeMeals">وجبات فعّالة</i>
+      </article>
+      <article class="stat-card">
+        <div class="stat-header">
+          <span data-i18n="trainingSessions">جلسات التدريب</span>
+          <span class="stat-icon">🏇</span>
+        </div>
+        <strong id="trainingCount">—</strong>
+        <i data-i18n="scheduledSessions">جلسات مجدولة</i>
+      </article>
+      <article class="stat-card role-restricted-card">
+        <div class="stat-header">
+          <span data-i18n="pendingReceivables">مستحقات معلقة</span>
+          <span class="stat-icon">💵</span>
+        </div>
+        <strong id="unpaidCount" class="warning-text">—</strong>
+        <i data-i18n="unpaidInvoices">فواتير بانتظار التحصيل</i>
+      </article>
+      <article class="stat-card">
+        <div class="stat-header">
+          <span data-i18n="urgentAlerts">التنبيهات العاجلة</span>
+          <span class="stat-icon">⚠️</span>
+        </div>
+        <strong id="alertsCount" class="danger-text">—</strong>
+        <i class="warning" data-i18n="requiresAction">تحتاج متابعة فورية</i>
+      </article>
+    </div>
+
+    <div class="grid">
+      <div class="panel" id="dashboardTasks">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow" data-i18n="dailyOps">تشغيل اليوم</p>
+            <h2 data-i18n="careTasks">مهام الرعاية والعمليات</h2>
+          </div>
+          <button type="button" class="text-btn" onclick="openTask()" data-i18n="addTask">+ إضافة مهمة</button>
+        </div>
+        <div id="taskList" class="task-list"></div>
+      </div>
+
+      <div class="panel alert">
+        <p class="eyebrow" data-i18n="smartAlert">المساعد الذكي</p>
+        <h2 data-i18n="healthFollowup">متابعة العمليات الميدانية</h2>
+        <div class="health-icon">✚</div>
+        <p id="smartAlertText" data-i18n="alertNotice">راجع التطعيمات وجلسات العلاج الطبيعي المستحقة وجداول التدريب المقررة اليوم.</p>
+        <div id="urgentAlert" class="urgent-alert"></div>
+        <div style="display:flex;gap:10px;margin-top:15px;" class="no-print">
+          <button type="button" class="btn-light" onclick="window.location.hash='#tasks'" data-i18n="viewAllTasks">عرض كل المهام</button>
+          <button type="button" class="btn-light role-restricted-action" onclick="openExpense()" data-i18n="addExpense">+ تسجيل مصروف</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: HORSES -->
+  <section id="horses" class="page-section horses-panel" style="display:none;">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow" data-i18n="mainRecord">السجل الرئيسي</p>
+          <h2 data-i18n="allHorses">جميع الخيول المسجلة</h2>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;" class="no-print">
+          <button type="button" class="btn-primary" onclick="printHorsesRegistry()" data-i18n="printPdf">📄 طباعة تقرير PDF</button>
+          <button type="button" class="btn-sec" onclick="exportHorsesCsv()" data-i18n="exportCsv">📥 تصدير CSV</button>
+          <input id="search" oninput="searchHorses()" data-i18n-placeholder="search" placeholder="ابحث بالاسم، الميكروشيب، المالك، الإسطبل...">
+        </div>
+      </div>
+
+      <div class="filters no-print">
+        <select id="breedFilter" onchange="searchHorses()">
+          <option value="" data-i18n="allBreeds">كل السلالات</option>
+        </select>
+        <select id="sexFilter" onchange="searchHorses()">
+          <option value="" data-i18n="allGenders">كل الجنسين</option>
+          <option value="ذكر" data-i18n="stallion">ذكر</option>
+          <option value="أنثى" data-i18n="mare">أنثى</option>
+        </select>
+        <select id="statusFilter" onchange="searchHorses()">
+          <option value="" data-i18n="allStatuses">كل الحالات</option>
+          <option value="نشط" data-i18n="active">نشط</option>
+          <option value="راحة" data-i18n="resting">راحة</option>
+          <option value="علاج" data-i18n="treatment">علاج</option>
+          <option value="مغادر" data-i18n="departed">مغادر</option>
+        </select>
+        <select id="sortFilter" onchange="searchHorses()">
+          <option value="name" data-i18n="sortName">ترتيب: الاسم</option>
+          <option value="age" data-i18n="sortAge">ترتيب: تاريخ الميلاد</option>
+          <option value="created" data-i18n="sortCreated">ترتيب: الأحدث تسجيلاً</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="horse">الحصان</th>
+              <th data-i18n="owner">المالك</th>
+              <th data-i18n="stall">الإسطبل</th>
+              <th data-i18n="status">الحالة</th>
+              <th data-i18n="actions" class="no-print" style="text-align:left;">الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="horseList"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: DAILY CARE & TASKS -->
+  <section id="tasksSection" class="page-section" style="display:none;">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow" data-i18n="operations">التشغيل الميداني</p>
+          <h2 data-i18n="allTasks">سجل مهام الرعاية والتدريب</h2>
+        </div>
+        <div style="display:flex;gap:10px;" class="no-print">
+          <button type="button" class="btn-sec" onclick="window.print()">📄 طباعة المهام (PDF)</button>
+          <button type="button" class="btn-primary" onclick="openTask()" data-i18n="addTask">+ إضافة مهمة جديدة</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="taskTitle">المهمة</th>
+              <th data-i18n="horse">الحصان</th>
+              <th data-i18n="category">النوع</th>
+              <th data-i18n="dueDate">تاريخ الاستحقاق</th>
+              <th data-i18n="priority">الأولوية</th>
+              <th data-i18n="status">الحالة</th>
+              <th data-i18n="actions" class="no-print" style="text-align:left;">إجراء</th>
+            </tr>
+          </thead>
+          <tbody id="allTasksTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: FINANCE & ACCOUNTING (Admin Only) -->
+  <section id="finance" class="page-section" style="display:none;">
+    <div class="summary" style="grid-template-columns: repeat(5, 1fr);">
+      <article class="stat-card">
+        <div class="stat-header">
+          <span data-i18n="totalInvoiced">إجمالي الفواتير</span>
+          <span class="stat-icon">📑</span>
+        </div>
+        <strong id="finTotalInvoiced">—</strong>
+        <i data-i18n="allInvoices">المطالبات الصادرة</i>
+      </article>
+      <article class="stat-card">
+        <div class="stat-header">
+          <span data-i18n="totalPaid">المحصل الفعلي</span>
+          <span class="stat-icon">💳</span>
+        </div>
+        <strong id="finPaid" class="success-text">—</strong>
+        <i data-i18n="collectedRevenue">مدفوعات مستلمة</i>
+      </article>
+      <article class="stat-card">
+        <div class="stat-header">
+          <span data-i18n="totalUnpaid">المعلق / المستحق</span>
+          <span class="stat-icon">⏳</span>
+        </div>
+        <strong id="finUnpaid" class="warning-text">—</strong>
+        <i data-i18n="pendingInvoices">بانتظار السداد</i>
+      </article>
+      <article class="stat-card">
+        <div class="stat-header">
+          <span data-i18n="totalExpenses">إجمالي المصروفات</span>
+          <span class="stat-icon">📉</span>
+        </div>
+        <strong id="finExpenses" class="danger-text">—</strong>
+        <i data-i18n="operationalCosts">أعلاف، بيطري، صيانة</i>
+      </article>
+      <article class="stat-card">
+        <div class="stat-header">
+          <span data-i18n="netCashFlow">صافي السيولة</span>
+          <span class="stat-icon">💰</span>
+        </div>
+        <strong id="finNet" class="accent-text">—</strong>
+        <i data-i18n="netBalance">المحصل - المصروفات</i>
+      </article>
+    </div>
+
+    <div class="finance-grid">
+      <!-- Invoices / Payments Panel -->
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow" data-i18n="revenueLedger">سجل الإيرادات</p>
+            <h2 data-i18n="invoicesAndPayments">الفواتير والدفعات</h2>
+          </div>
+          <div style="display:flex;gap:8px;" class="no-print">
+            <button type="button" class="btn-primary" onclick="printFinanceReport()" data-i18n="printPdf">📄 طباعة تقرير PDF</button>
+            <button type="button" class="btn-sec" onclick="exportFinanceCsv()" data-i18n="exportCsv">📥 تصدير</button>
+            <button type="button" class="btn-sec" onclick="openPayment()" data-i18n="addPayment">+ إضافة فاتورة</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="description">البيان</th>
+                <th data-i18n="horse">الحصان</th>
+                <th data-i18n="amount">المبلغ</th>
+                <th data-i18n="dueDate">الاستحقاق</th>
+                <th data-i18n="status">الحالة</th>
+                <th data-i18n="actions" class="no-print" style="text-align:left;">إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="paymentsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Expenses Panel -->
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow" data-i18n="costLedger">سجل التكاليف</p>
+            <h2 data-i18n="expenses">المصروفات التشغيلية</h2>
+          </div>
+          <button type="button" class="btn-sec no-print" onclick="openExpense()" data-i18n="addExpense">+ تسجيل مصروف</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="category">التصنيف</th>
+                <th data-i18n="description">البيان / المورد</th>
+                <th data-i18n="amount">المبلغ</th>
+                <th data-i18n="date">التاريخ</th>
+                <th data-i18n="actions" class="no-print" style="text-align:left;">إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="expensesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: ARCHIVE -->
+  <section id="archive" class="page-section horses-panel" style="display:none;">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow" data-i18n="archive">الأرشيف والسجلات السابقة</p>
+          <h2 data-i18n="deletedRecords">الخيول المؤرشفة</h2>
+        </div>
+        <p class="section-desc" data-i18n="archiveDesc">يمكنك استرجاع أي حصان مؤرشف في أي وقت إلى السجلات النشطة، أو حذفه نهائياً عند الرغبة.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="horse">الحصان</th>
+              <th data-i18n="owner">المالك</th>
+              <th data-i18n="stall">الإسطبل</th>
+              <th data-i18n="status">الحالة</th>
+              <th data-i18n="actions" class="no-print" style="text-align:left;">الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="archiveList"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: SETTINGS & BACKUPS (Admin Only) -->
+  <section id="settings" class="page-section" style="display:none;">
+    <div class="settings-grid">
+      <!-- General Stable Settings -->
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow" data-i18n="preferences">تخصيص النظام</p>
+            <h2 data-i18n="stableSettings">بيانات وإعدادات الإسطبل</h2>
+          </div>
+        </div>
+        <form id="settingsForm" onsubmit="saveSettings(event)">
+          <div class="form-grid">
+            <label>
+              <span data-i18n="stableName">اسم الإسطبل</span>
+              <input name="stable_name" id="setStableName" required value="إسطبل الخيّالة - AL-Khyala">
+            </label>
+            <label>
+              <span data-i18n="managerName">اسم المدير المسؤول</span>
+              <input name="manager_name" id="setManagerName" required value="مدير الإسطبل">
+            </label>
+            <label>
+              <span data-i18n="phone">رقم الهاتف والتواصل</span>
+              <input name="phone" id="setPhone" value="01000000000">
+            </label>
+            <label>
+              <span data-i18n="email">البريد الإلكتروني</span>
+              <input name="email" id="setEmail" type="email" value="info@alkhyala.com">
+            </label>
+            <label>
+              <span data-i18n="address">العنوان والموقع</span>
+              <input name="address" id="setAddress" value="الإسكندرية، مصر">
+            </label>
+            <label>
+              <span data-i18n="currency">العملة الافتراضية</span>
+              <input name="currency" id="setCurrency" value="ج.م">
+            </label>
+            <label>
+              <span data-i18n="alertDaysThreshold">تنبيه الاستحقاقات قبل (أيام)</span>
+              <input name="alert_days" id="setAlertDays" type="number" min="1" max="30" value="7">
+            </label>
+          </div>
+          <div style="margin-top:18px;display:flex;justify-content:flex-end;">
+            <button type="submit" class="btn-primary" data-i18n="saveSettings">حفظ التغييرات</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Backup and Recovery Management -->
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow" data-i18n="database">حماية البيانات</p>
+            <h2 data-i18n="backupManagement">النسخ الاحتياطي والاسترجاع</h2>
+          </div>
+          <button type="button" class="btn-primary" onclick="createBackup()" data-i18n="createBackupNow">⚡ إنشاء نسخة الآن</button>
+        </div>
+        <p class="section-desc" data-i18n="backupNotice">يتم حفظ نسخ كاملة لقاعدة البيانات SQLite في مجلد backups لضمان عدم فقدان أي سجلات.</p>
+        <div class="table-wrap" style="margin-top:10px;">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="backupFile">اسم النسخة</th>
+                <th data-i18n="fileSize">الحجم</th>
+                <th data-i18n="createdDate">تاريخ الإنشاء</th>
+                <th data-i18n="actions" class="no-print" style="text-align:left;">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="backupsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- System Diagnostics & Fast Exports -->
+      <div class="panel full-width">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow" data-i18n="diagnostics">معلومات النظام والتقارير</p>
+            <h2 data-i18n="systemStats">حالة قاعدة البيانات والطباعة السريعة</h2>
+          </div>
+        </div>
+        <div class="stats-pills" id="systemStatsPills">
+          <div class="pill"><span>حجم قاعدة البيانات:</span> <b id="dbSizeKb">— KB</b></div>
+          <div class="pill"><span>إجمالي سجلات الخيول:</span> <b id="dbHorsesCount">—</b></div>
+          <div class="pill"><span>إجمالي مهام الرعاية:</span> <b id="dbTasksCount">—</b></div>
+          <div class="pill"><span>إجمالي السجلات الطبية:</span> <b id="dbMedicalCount">—</b></div>
+          <div class="pill"><span>سجلات التدقيق:</span> <b id="dbAuditCount">—</b></div>
+        </div>
+        <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
+          <button type="button" class="btn-primary" onclick="printHorsesRegistry()">📄 طباعة سجل الخيول (PDF)</button>
+          <button type="button" class="btn-primary" onclick="printFinanceReport()">📄 طباعة التقرير المالي (PDF)</button>
+          <button type="button" class="btn-sec" onclick="exportHorsesCsv()">📥 تصدير الخيول (CSV)</button>
+          <button type="button" class="btn-sec" onclick="exportFinanceCsv()">📥 تصدير الحسابات (CSV)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- MODAL: ADD / EDIT HORSE -->
+<dialog id="horseDialog">
+  <form id="horseForm" method="dialog">
+    <div class="modal-head">
+      <h2 id="horseModalTitle" data-i18n="addHorseModal">إضافة حصان جديد</h2>
+      <button type="button" class="close" onclick="closeDialog('horseDialog')">×</button>
+    </div>
+    
+    <div class="form-tabs">
+      <button type="button" class="tab-btn active" onclick="switchFormTab('tab-basic')">البيانات الأساسية</button>
+      <button type="button" class="tab-btn" onclick="switchFormTab('tab-pedigree')">النسب والبدن</button>
+      <button type="button" class="tab-btn" onclick="switchFormTab('tab-care')">التغذية والتدريب والصورة</button>
+    </div>
+
+    <div id="tab-basic" class="tab-content active">
+      <div class="form-grid">
+        <label><span data-i18n="horseName">اسم الحصان*</span><input name="name" required placeholder="مثال: برق"></label>
+        <label><span data-i18n="microchip">رقم الميكروشيب*</span><input name="microchip" required placeholder="982000000000000"></label>
+        <label><span data-i18n="breed">السلالة</span><input name="breed" placeholder="عربي أصيل، ثوروبريد..."></label>
+        <label><span data-i18n="sex">الجنس</span>
+          <select name="sex">
+            <option value="">—</option>
+            <option value="ذكر">ذكر</option>
+            <option value="أنثى">أنثى</option>
+          </select>
+        </label>
+        <label><span data-i18n="birthDate">تاريخ الميلاد</span><input name="birth_date" type="date"></label>
+        <label><span data-i18n="colour">لون الحصان</span><input name="colour" placeholder="كميت، أشقر، رمادي، أدهم..."></label>
+        <label><span data-i18n="ownerName">اسم المالك</span><input name="owner_name"></label>
+        <label><span data-i18n="ownerPhone">هاتف المالك</span><input name="owner_phone" placeholder="01000000000"></label>
+        <label><span data-i18n="stallNumber">رقم الإسطبل (البوكس)</span><input name="stall" placeholder="A-01"></label>
+        <label><span data-i18n="status">الحالة</span>
+          <select name="status">
+            <option value="نشط">نشط</option>
+            <option value="راحة">راحة</option>
+            <option value="علاج">علاج</option>
+            <option value="مغادر">مغادر</option>
+          </select>
+        </label>
+      </div>
+      <label style="margin-top:10px;"><span data-i18n="generalNotes">ملاحظات عامة</span><textarea name="notes" placeholder="أي ملاحظات هامة تخص سلوك الحصان..."></textarea></label>
+    </div>
+
+    <div id="tab-pedigree" class="tab-content">
+      <div class="form-grid">
+        <label><span data-i18n="heightCm">الطول (سم)</span><input name="height_cm" type="number" min="0" step="0.1" placeholder="155"></label>
+        <label><span data-i18n="weightKg">الوزن (كجم)</span><input name="weight_kg" type="number" min="0" step="0.1" placeholder="450"></label>
+        <label><span data-i18n="sire">اسم الأب (Sire)</span><input name="sire" placeholder="اسم الأب"></label>
+        <label><span data-i18n="dam">اسم الأم (Dam)</span><input name="dam" placeholder="اسم الأم"></label>
+        <label><span data-i18n="grandSire">اسم الجد (من الأب)</span><input name="grand_sire" placeholder="الجد"></label>
+        <label><span data-i18n="grandDam">اسم الجدة (من الأم)</span><input name="grand_dam" placeholder="الجدة"></label>
+      </div>
+      <label style="margin-top:10px;"><span data-i18n="allergies">الحساسيات والاحتياطات الطبية</span><textarea name="allergies" placeholder="مثال: حساسية غبار التبن، حساسية دواء معين..."></textarea></label>
+    </div>
+
+    <div id="tab-care" class="tab-content">
+      <label><span data-i18n="feedingNotes">ملاحظات خطة التغذية</span><textarea name="feed_notes" placeholder="نوع العلف، عدد الوجبات، المكملات والفيتامينات اليومية..."></textarea></label>
+      <label style="margin-top:10px;"><span data-i18n="trainingNotes">ملاحظات برنامج التدريب</span><textarea name="training_notes" placeholder="المدرب، المستوى التدريبي، جدول التمارين والقفز..."></textarea></label>
+      
+      <div class="photo-field">
+        <label>
+          <span data-i18n="mainPhoto">📸 الصورة الرئيسية للحصان</span>
+          <input name="photo" id="horsePhotoInput" type="file" accept="image/jpeg,image/png,image/webp">
+          <small data-i18n="photoTypes">صيغ JPG وPNG وWEBP مدعومة حتى 16MB</small>
+        </label>
+      </div>
+    </div>
+
+    <p class="form-error" id="horseError"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn-sec" onclick="closeDialog('horseDialog')" data-i18n="cancel">إلغاء</button>
+      <button type="submit" class="btn-primary" data-i18n="saveRecord">حفظ السجل</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- MODAL: ADD TASK -->
+<dialog id="taskDialog">
+  <form id="taskForm" method="dialog">
+    <div class="modal-head">
+      <h2 data-i18n="newTaskModal">مهمة رعاية جديدة</h2>
+      <button type="button" class="close" onclick="closeDialog('taskDialog')">×</button>
+    </div>
+    <div class="form-grid">
+      <label><span data-i18n="horse">الحصان*</span><select name="horse_id" id="taskHorse" required></select></label>
+      <label><span data-i18n="taskType">نوع المهمة</span>
+        <select name="category" id="taskCategory">
+          <option value="رعاية">رعاية عامة</option>
+          <option value="بيطري">كشف بيطري</option>
+          <option value="تطعيم">تطعيم ولقاح</option>
+          <option value="حوافر">تقليم حوافر / حدوة</option>
+          <option value="تغذية">تغذية ومكملات</option>
+          <option value="تدريب">تدريب وتمارين</option>
+        </select>
+      </label>
+      <label class="full-span"><span data-i18n="taskDescription">وصف المهمة*</span><input name="title" required placeholder="مثال: تطعيم الإنفلونزا السنوي"></label>
+      <label><span data-i18n="dueDate">تاريخ الاستحقاق*</span><input name="due_date" type="date" required></label>
+      <label><span data-i18n="priority">الأولوية</span>
+        <select name="priority">
+          <option value="متوسط">متوسط</option>
+          <option value="عالي">عالي</option>
+          <option value="عاجل">عاجل 🔴</option>
+        </select>
+      </label>
+    </div>
+    <p class="form-error" id="taskError"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn-sec" onclick="closeDialog('taskDialog')" data-i18n="cancel">إلغاء</button>
+      <button type="submit" class="btn-primary" data-i18n="addTaskBtn">إضافة المهمة</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- MODAL: ADD PAYMENT / INVOICE (Admin Only) -->
+<dialog id="paymentDialog">
+  <form id="paymentForm" method="dialog">
+    <div class="modal-head">
+      <h2 data-i18n="newInvoiceModal">إضافة فاتورة / دفعة مالية</h2>
+      <button type="button" class="close" onclick="closeDialog('paymentDialog')">×</button>
+    </div>
+    <div class="form-grid">
+      <label><span data-i18n="horse">الحصان (اختياري)</span><select name="horse_id" id="paymentHorse"></select></label>
+      <label><span data-i18n="amount">المبلغ (ج.م)*</span><input name="amount" type="number" step="0.01" min="0" required placeholder="4500"></label>
+      <label class="full-span"><span data-i18n="description">البيان / الوصف*</span><input name="description" required placeholder="مثال: إيواء وتدريب شهر سبتمبر"></label>
+      <label><span data-i18n="dueDate">تاريخ الاستحقاق*</span><input name="due_date" type="date" required></label>
+      <label><span data-i18n="paymentStatus">حالة الدفع</span>
+        <select name="paid">
+          <option value="0">معلقة (غير مدفوعة)</option>
+          <option value="1">تم التحصيل (مدفوعة)</option>
+        </select>
+      </label>
+    </div>
+    <p class="form-error" id="paymentError"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn-sec" onclick="closeDialog('paymentDialog')" data-i18n="cancel">إلغاء</button>
+      <button type="submit" class="btn-primary" data-i18n="saveInvoice">حفظ الفاتورة</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- MODAL: ADD EXPENSE (Admin Only) -->
+<dialog id="expenseDialog">
+  <form id="expenseForm" method="dialog">
+    <div class="modal-head">
+      <h2 data-i18n="newExpenseModal">تسجيل مصروف تشغيلي</h2>
+      <button type="button" class="close" onclick="closeDialog('expenseDialog')">×</button>
+    </div>
+    <div class="form-grid">
+      <label><span data-i18n="expenseCategory">التصنيف*</span>
+        <select name="category" required>
+          <option value="أعلاف وتغذية">أعلاف وتغذية</option>
+          <option value="بيطري وأدوية">بيطري وأدوية</option>
+          <option value="صيانة ومرافق">صيانة ومرافق</option>
+          <option value="أدوات ومهمات">أدوات ومهمات</option>
+          <option value="رواتب وأجور">رواتب وأجور</option>
+          <option value="نثريات أخرى">نثريات أخرى</option>
+        </select>
+      </label>
+      <label><span data-i18n="amount">المبلغ (ج.م)*</span><input name="amount" type="number" step="0.01" min="0" required placeholder="1800"></label>
+      <label class="full-span"><span data-i18n="description">البيان / التفاصيل*</span><input name="description" required placeholder="مثال: شراء مكملات غذائية وفيتامينات"></label>
+      <label><span data-i18n="vendor">المورد / الجهة</span><input name="vendor" placeholder="اسم الشركة أو المتجر"></label>
+      <label><span data-i18n="expenseDate">تاريخ الصرف*</span><input name="expense_date" type="date" required></label>
+    </div>
+    <p class="form-error" id="expenseError"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn-sec" onclick="closeDialog('expenseDialog')" data-i18n="cancel">إلغاء</button>
+      <button type="submit" class="btn-primary" data-i18n="saveExpense">تسجيل المصروف</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- MODAL: HORSE FULL DETAILS & HISTORY -->
+<dialog id="horseDetails">
+  <div class="details">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow" data-i18n="horseFile">الملف الشامل للحصان</p>
+        <h2 id="detailName">—</h2>
+      </div>
+      <button type="button" class="close no-print" onclick="closeDialog('horseDetails')">×</button>
+    </div>
+
+    <div class="profile-actions-bar no-print">
+      <button type="button" class="btn-primary" onclick="printSingleHorseProfile()" data-i18n="printHorseProfile">📄 طباعة ملف الحصان (PDF)</button>
+      <button type="button" class="btn-sec" onclick="openPhotoUpload()" data-i18n="addPhoto">📸 رفع صورة</button>
+      <button type="button" class="btn-sec" onclick="editHorse()" data-i18n="edit">✏️ تعديل البيانات</button>
+      <button type="button" class="btn-sec" id="detailArchiveBtn" onclick="detailArchiveHorse()">📁 أرشفة</button>
+      <button type="button" class="btn-danger role-restricted-action" id="detailDeleteBtn" onclick="detailDeleteHorsePermanent()">🗑️ حذف نهائي</button>
+    </div>
+
+    <div id="detailMeta" class="detail-meta"></div>
+
+    <div class="detail-grid">
+      <section>
+        <h3 data-i18n="basicInfo">📋 البيانات الأساسية</h3>
+        <dl id="basicInfo"></dl>
+      </section>
+
+      <section>
+        <h3 data-i18n="pedigreeInfo">🌳 النسب والخصائص البدنية</h3>
+        <dl id="pedigreeInfo"></dl>
+      </section>
+
+      <section>
+        <h3 data-i18n="ownerInfo">👤 بيانات المالك والإيواء</h3>
+        <dl id="ownerInfo"></dl>
+      </section>
+
+      <section>
+        <h3 data-i18n="medicalFile">💉 السجل الطبي والتطعيمات</h3>
+        <div id="medicalInfo" class="history-list"></div>
+      </section>
+
+      <section>
+        <h3 data-i18n="medicationFile">💊 الأدوية والعلاجات الفعالة</h3>
+        <div id="medicationInfo" class="history-list"></div>
+      </section>
+
+      <section>
+        <h3 data-i18n="feedingSchedule">🌾 خطة وملاحظات التغذية</h3>
+        <div id="feedingInfo" class="history-list"></div>
+      </section>
+
+      <section>
+        <h3 data-i18n="trainingLog">🏇 سجل وجلسات التدريب</h3>
+        <div id="trainingInfo" class="history-list"></div>
+      </section>
+
+      <section>
+        <h3 data-i18n="careHistory">📋 الرعاية والمهام المرتبطة</h3>
+        <div id="careInfo" class="history-list"></div>
+      </section>
+
+      <section id="horseDetailPaymentsSection" class="role-restricted-card">
+        <h3 data-i18n="financialHistory">💰 الفواتير والحسابات</h3>
+        <div id="paymentInfo" class="history-list"></div>
+      </section>
+
+      <section>
+        <h3 data-i18n="auditTrail">📝 سجل التغييرات والتدقيق</h3>
+        <div id="auditInfo" class="history-list"></div>
+      </section>
+    </div>
+  </div>
+</dialog>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
